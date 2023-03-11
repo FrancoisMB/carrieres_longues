@@ -128,7 +128,7 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
         AV_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AV_annees_civiles_pleinement_cotisees + 2, 4, 1) # c'est +2 parce que annees_civ_pleinement_cotisees = 42
         AV_nb_trimestres_cotises +=1
     elif AV_nb_trimestres_cotises == AV_total_trim_a_cotiser-2:
-        # si c'est 171, il lui manque deux trimestres, il pourra partir au 1er juillet
+        # si c'est 170, il lui manque deux trimestres, il pourra partir au 1er juillet
         AV_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AV_annees_civiles_pleinement_cotisees + 2, 7, 1)
         AV_nb_trimestres_cotises += 2
     elif AV_nb_trimestres_cotises == AV_total_trim_a_cotiser-3:
@@ -309,7 +309,7 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
         AP_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AP_annees_civiles_pleinement_cotisees + 2, 4, 1)
         AP_nb_trimestres_cotises +=1
     elif AP_nb_trimestres_cotises == AP_total_trim_a_cotiser-2:
-        # si c'est 171, il lui manque deux trimestres, il pourra partir au 1er juillet
+        # si c'est 170, il lui manque deux trimestres, il pourra partir au 1er juillet
         AP_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AP_annees_civiles_pleinement_cotisees + 2, 7, 1)
         AP_nb_trimestres_cotises += 2
     elif AP_nb_trimestres_cotises == AP_total_trim_a_cotiser-3:
@@ -490,4 +490,28 @@ for Nm in range(1,13):
                     except Exception as e:
                         print("autre erreur")
                         err = e
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
