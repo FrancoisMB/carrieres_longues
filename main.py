@@ -25,6 +25,7 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
 
     #### AVANT REFORME ####
      
+    
     # 1 - Détermination du nombre de mois de travail à faire avant 31/12 de l'année du Xème anniversaire, en fonction du trimestre de naissance
     if date_naissance.month in range(1,10):
         # quelqu'un né de janvier à septembre inclus doit cotiser 5 trimestres avant le 31/12 de ses 16 (ou 20 ans) pour être éligible carrière longue
@@ -111,7 +112,7 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
         AV_nb_trimestres_cotises = 1
     
     # 6.2 - Nb trimestres cotisés carrière
-    # Pour chaque année pleinement cotisée, on rajoute 4 trimestres
+    # Pour chaque année pleinement cotisée, on rajoute 4 trimestres, tout en veillant à ne jamais dépasser le nombre total de trimestres que doit cotiser la personne
     for i in range(50):
         if AV_nb_trimestres_cotises <= (AV_total_trim_a_cotiser-4):
             AV_nb_trimestres_cotises += 4
@@ -178,6 +179,7 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
     
     
     # 1 - Détermination du nombre de mois de travail à faire avant 31/12 de l'année du Xème anniversaire, en fonction du trimestre de naissance
+    # Pas modifié par la réforme
     if date_naissance.month in range(1,10):
         # quelqu'un né de janvier à septembre inclus doit cotiser 5 trimestres avant le 31/12 de ses 16 (ou 20 ans) pour être éligible carrière longue
         # ce qui signifie 4 trimestres dans l'année de ses 16 ans (ou 20 ans) et 1 trimestre dans l'année de ses 15 ans (ou 19 ans)
@@ -193,9 +195,11 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
         raise Exception("Il y a un souci sur le mois de naissance...")
     
     # 2 - Calcul de l'éligibilité à un des dispositifs carrière longue
+    # Modifié par la réforme
     AP_CL = "non"
     # on regarde si la date de début de travail permet d'être éligible au dispositif carrière longue 20 ans, compte tenu de la date de naissance
-    # que la réponse soit oui ou non, on teste ensuite la même chose pour le dispositif carrière longue 16 ans, et si c'est oui, on corrige
+    # que la réponse soit oui ou non, on teste ensuite la même chose pour le dispositif carrière longue 20 ans, et si c'est oui, on corrige
+    # puis on teste 18 ans, puis 16 ans
     for AP_borne in [21,20,18,16]: # on teste chacune des bornes, en descendant, de manière à ne retenir que la dernière qui est valide
         AP_date_31_12_X_ans = datetime.datetime(date_naissance.year + AP_borne, 12, 31)   
 
@@ -204,6 +208,7 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
             AP_CL = str(AP_borne)
     
     # 3 - Ici, on entre les âges légaux de départ, et les durées de cotisation requises, pour les générations transitoires
+    # Modifié par la réforme
     # Source : dossier de presse https://www.gouvernement.fr/upload/media/content/0001/05/1548a2feb27d6e5ed4d637eb051bb95daeb2200f.pdf
     # Tableau page 18, colonnes 2 et 4
     
@@ -241,6 +246,7 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
         AP_total_trim_a_cotiser = 172
     
     # 4 - Ensuite, on rectifie l'âge légal de départ à la retraite pour les cas carrière longue
+    # Modifié par la réforme
     if AP_CL == "16":
         AP_age_legal = 58
     elif AP_CL == "18":
@@ -248,11 +254,12 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
     elif AP_CL == "20":
         AP_age_legal = AP_age_legal - 2 
     elif AP_CL == "21":
-        AP_age_legal = AP_age_legal - 1
+        AP_age_legal = AP_age_legal - 1 # Pas complètement certain, mais fixer 63, plutôt que "âge légal - 1"  n'aurait pas de sens et créerait des effets de seuil sur les cas transitoires
     else:
         AP_age_legal = 64
     
     # 5 - Calcul date légale de départ
+    # Pas modifié par la réforme
     # Pour quelqu'un né entre le 2 et le 31 du mois, il peut partir le 1er du mois qui suit sont Xème anniversaire, où X = son âge légal de départ en retraite
     # Pour quelqu'un né le 1er du mois, il peut partir dès ce jour là
     if date_naissance.day == 1:
@@ -265,6 +272,7 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
     AP_annees_civiles_pleinement_cotisees = 0
     
     # 6.1 - Nb trimestres cotisés première année
+    # Pas modifié par la réforme
     # La première année, entre 0 et 4 trimestres peuvent être cotisés, selon la date de début de travail :
         # Si tout décembre est travaillé : 1 mois cotisé
         # Si tout novembre est également travaillé : 2 mois cotisés
@@ -283,13 +291,15 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
         AP_nb_trimestres_cotises = 1
         
     # 6.2 - Nb trimestres cotisés carrière
-    # Pour chaque année pleinement cotisée, on rajoute 4 trimestres
-    for i in range(100):
+    # Pas modifié par la réforme
+    # Pour chaque année pleinement cotisée, on rajoute 4 trimestres, tout en veillant à ne jamais dépasser le nombre total de trimestres que doit cotiser la personne
+    for i in range(50):
         if AP_nb_trimestres_cotises <= (AP_total_trim_a_cotiser-4):
             AP_nb_trimestres_cotises += 4
             AP_annees_civiles_pleinement_cotisees += 1
     
     # 6.3 - Nb trimestres cotisés dernière année
+    # Pas modifié par la réforme
     if AP_nb_trimestres_cotises >= AP_total_trim_a_cotiser:
         # si le nb de trimestres cotisés est pile 172, c'est que 4 trimestres ont été cotisés la première année, toutes les années suivantes aussi
         # et 4 la dernière année. Notre cas aura tous ses trimestres le 31 décembre de sa dernière année de travail et pourra partir le 1er janvier suivant
@@ -310,6 +320,7 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
     del AP_annees_civiles_pleinement_cotisees
     
     # 7 - Calcul de l'âge réel de départ = max entre date légale et date depart avec nb trim
+    # Pas modifié par la réforme
     if AP_CL == "non":
         AP_date_depart_reelle = AP_date_legale
     else:
@@ -317,6 +328,7 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
     AP_age_reel = relativedelta(AP_date_depart_reelle, date_naissance)
 
     # 8 - Vu l'âge réel de départ, calcul de la durée réellement cotisée
+    # Pas modifié par la réforme
     AP_nb_trim_reellement_cotises = 0
     # nb trimestres cotisés première année
     if date_debut_travail <= datetime.datetime(date_debut_travail.year, 9, 1):
@@ -340,6 +352,7 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
         AP_nb_trim_reellement_cotises += 1
     
     # 9 - Calcul de la durée réellement travaillée
+    # Pas modifié par la réforme
     AP_duree_reelle_travail = relativedelta(AP_date_depart_reelle, date_debut_travail)
     
     
@@ -477,5 +490,4 @@ for Nm in range(1,13):
                     except Exception as e:
                         print("autre erreur")
                         err = e
-
 
