@@ -96,10 +96,10 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
     # 6.1 - Nb trimestres cotisés première année
     # La première année, entre 0 et 4 trimestres peuvent être cotisés, selon la date de début de travail :
         # Si tout décembre est travaillé : 1 trimestre cotisé
-        # Si tout novembre est également travaillé : 2 trimestre cotisés
-        # Si tout octobre est également travaillé : 3 trimestre cotisés
-        # Si tout septembre est également travaillé : 4 trimestre cotisés
-        # Au delà : 4 trimestre cotisés, car c'est le maximum chaque année
+        # Si tout novembre est également travaillé : 2 trimestres cotisés
+        # Si tout octobre est également travaillé : 3 trimestres cotisés
+        # Si tout septembre est également travaillé : 4 trimestres cotisés
+        # Au delà : 4 trimestres cotisés, car c'est le maximum chaque année
         # (NB il est fait l'hypothèse simplificatrice que 150 heures au SMIC = un mois plein de travail)
     if date_debut_travail <= datetime.datetime(date_debut_travail.year, 9, 1):
         AV_nb_trimestres_cotises = 4
@@ -275,10 +275,10 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
     # Pas modifié par la réforme
     # La première année, entre 0 et 4 trimestres peuvent être cotisés, selon la date de début de travail :
         # Si tout décembre est travaillé : 1 trimestre cotisé
-        # Si tout novembre est également travaillé : 2 trimestre cotisés
-        # Si tout octobre est également travaillé : 3 trimestre cotisés
-        # Si tout septembre est également travaillé : 4 trimestre cotisés
-        # Au delà : 4 trimestre cotisés, car c'est le maximum chaque année
+        # Si tout novembre est également travaillé : 2 trimestres cotisés
+        # Si tout octobre est également travaillé : 3 trimestres cotisés
+        # Si tout septembre est également travaillé : 4 trimestres cotisés
+        # Au delà : 4 trimestres cotisés, car c'est le maximum chaque année
         # (NB il est fait l'hypothèse simplificatrice que 150 heures au SMIC = un mois plein de travail)
     if date_debut_travail <= datetime.datetime(date_debut_travail.year, 9, 1):
         AP_nb_trimestres_cotises = 4
