@@ -256,7 +256,7 @@ def calcul_regles(date_naissance, date_debut_travail, verbose = 1, enregistrer =
     elif AP_CL == "21":
         AP_age_legal = AP_age_legal - 1 # Pas complètement certain, mais fixer 63, plutôt que "âge légal - 1"  n'aurait pas de sens et créerait des effets de seuil sur les cas transitoires
     else:
-        AP_age_legal = 64
+        AP_age_legal = AP_age_legal # Je sais, c'est tautologique, mais au moins ça sera compréhensible pour les lecteurs
     
     # 5 - Calcul date légale de départ
     # Pas modifié par la réforme
