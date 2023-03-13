@@ -11,16 +11,15 @@ os.chdir(path_wd)
 def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enregistrer = 0, filename = "no_filename"):
     
     # initialisation des fichiers
-    if not os.path.exists(filename + '.csv'):
-        Path(filename + '.csv').touch()
-        with open(filename + '.csv',"w") as f:
-            f.write("date_naissance;date_debut_travail;AV_cas_carriere_longue;AV_date_depart_selon_AP_age_legal;AV_date_depart_selon_nb_trim;AV_ce_qui_determine_vrai_age_depart;AV_age_reel_depart;AV_duree_reelle_cotis;AV_duree_reelle_travail;AP_cas_carriere_longue;AP_date_depart_selon_AP_age_legal;AP_date_depart_selon_nb_trim;AP_ce_qui_determine_vrai_age_depart;AP_age_reel_depart;AP_duree_reelle_cotis;AP_duree_reelle_travail")
+    if enregistrer:
+        if not os.path.exists(filename + '.csv'):
+            Path(filename + '.csv').touch()
+            with open(filename + '.csv',"w") as f:
+                f.write("date_naissance;date_debut_travail;AV_cas_carriere_longue;AV_date_depart_selon_AP_age_legal;AV_date_depart_selon_nb_trim;AV_ce_qui_determine_vrai_age_depart;AV_age_reel_depart;AV_duree_reelle_cotis;AV_duree_reelle_travail;AP_cas_carriere_longue;AP_date_depart_selon_AP_age_legal;AP_date_depart_selon_nb_trim;AP_ce_qui_determine_vrai_age_depart;AP_age_reel_depart;AP_duree_reelle_cotis;AP_duree_reelle_travail")
 
-    
     date_naissance = datetime.datetime.strptime(date_naissance, '%d/%m/%Y')
     date_debut_travail = datetime.datetime.strptime(date_debut_travail, '%d/%m/%Y')
     
-
 
     #### AVANT REFORME ####
      
@@ -100,6 +99,7 @@ def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enre
         # Si tout septembre est également travaillé : 4 trimestres cotisés
         # Au delà : 4 trimestres cotisés, car c'est le maximum chaque année
         # (NB il est fait l'hypothèse simplificatrice que 150 heures au SMIC = un mois plein de travail)
+        # (En effet, 150h au SMIC, à 35h par semaine et 5 jours ouvrés par semaine, ça fait 21,4 jours de travail, soit à peu près le nombre de jours ouvrés dans un mois)
     if date_debut_travail <= datetime.datetime(date_debut_travail.year, 9, 1):
         AV_nb_trimestres_cotises = 4
         AV_annees_civiles_pleinement_cotisees += 1
@@ -279,6 +279,7 @@ def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enre
         # Si tout septembre est également travaillé : 4 trimestres cotisés
         # Au delà : 4 trimestres cotisés, car c'est le maximum chaque année
         # (NB il est fait l'hypothèse simplificatrice que 150 heures au SMIC = un mois plein de travail)
+        # (En effet, 150h au SMIC, à 35h par semaine et 5 jours ouvrés par semaine, ça fait 21,4 jours de travail, soit à peu près le nombre de jours ouvrés dans un mois)
     if date_debut_travail <= datetime.datetime(date_debut_travail.year, 9, 1):
         AP_nb_trimestres_cotises = 4
         AP_annees_civiles_pleinement_cotisees += 1
@@ -670,6 +671,111 @@ nb_cas_travail_44_plus # 59067
 nb_cas_travail_45_plus # 0
 
 
+
+
+
+
+#%% calculs sur les cas CL transitoires
+
+total_cas = 0
+nb_cas_changed = 0
+nb_cas_171_ou_moins = 0
+nb_cas_172 = 0
+nb_cas_173 = 0
+nb_cas_173_ou_plus = 0
+nb_cas_174 = 0
+nb_cas_175 = 0
+nb_cas_176 = 0
+nb_cas_177 = 0
+nb_cas_178 = 0
+nb_cas_179 = 0
+nb_cas_180 = 0
+nb_cas_181_ou_plus = 0
+nb_cas_travail_43_plus = 0
+nb_cas_travail_44_plus = 0
+nb_cas_travail_45_plus = 0
+
+nb_age_legal = 0
+nb_cotisation = 0
+
+for Ny in range(1961,1973):
+    for Nm in range(1,13):
+        for Nd in range(1,32):
+            date_naissance = str(Nd)+"/"+str(Nm)+"/"+str(Ny)
+            #print(date_naissance)
+            
+            for Ty in range(Ny+15,Ny+23):
+                for Tm in range(1,13):
+                    for Td in range(1,32):
+                        date_debut_travail = str(Td)+"/"+str(Tm)+"/"+str(Ty)
+    
+                        try:
+                            result = calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 0)
+                            
+                            total_cas += 1
+                            if result["situation_changee"]:
+                                nb_cas_changed += 1
+                                
+                                if result["AP_nb_trim_reellement_cotises"] <= 171 : 
+                                    nb_cas_171_ou_moins += 1
+                                    # print("171-", date_naissance, date_debut_travail)
+                                if result["AP_nb_trim_reellement_cotises"] == 172 : nb_cas_172 += 1
+                                if result["AP_nb_trim_reellement_cotises"] == 173 : nb_cas_173 += 1
+                                if result["AP_nb_trim_reellement_cotises"] >= 173 : 
+                                    nb_cas_173_ou_plus += 1
+                                    if result["AP_vraie_cause_depart"] == 'duree_cotisation':
+                                        nb_cotisation += 1
+                                    elif result["AP_vraie_cause_depart"] == 'age_legal':
+                                        nb_age_legal += 1
+                                if result["AP_nb_trim_reellement_cotises"] == 174 : nb_cas_174 += 1
+                                if result["AP_nb_trim_reellement_cotises"] == 175 : nb_cas_175 += 1
+                                if result["AP_nb_trim_reellement_cotises"] == 176 : nb_cas_176 += 1
+                                if result["AP_nb_trim_reellement_cotises"] == 177 : nb_cas_177 += 1
+                                if result["AP_nb_trim_reellement_cotises"] == 178 : nb_cas_178 += 1
+                                if result["AP_nb_trim_reellement_cotises"] == 179 : 
+                                    nb_cas_179 += 1
+                                    print(date_naissance, date_debut_travail)
+                                    
+                                if result["AP_nb_trim_reellement_cotises"] == 180 : 
+                                    nb_cas_180 += 1
+    
+                                if result["AP_nb_trim_reellement_cotises"] > 180 : nb_cas_181_ou_plus += 1
+    
+                                if result["AP_duree_reelle_travail.years"] >= 43 : 
+                                    nb_cas_travail_43_plus += 1
+                                if result["AP_duree_reelle_travail.years"] >= 44 : nb_cas_travail_44_plus += 1
+                                if result["AP_duree_reelle_travail.years"] >= 45 : 
+                                    nb_cas_travail_45_plus += 1
+    
+                        except ValueError:
+                            pass
+                        except Exception as e:
+                            print("autre erreur")
+                            err = e
+
+total_cas # 9 340 302
+nb_cas_changed # 7 856 094
+nb_cas_171_ou_moins # 1 060 762
+nb_cas_172 # 359 791
+#nb_cas_173_ou_plus # 6 435 541 =  % des cas
+nb_cas_173 # 242 311
+nb_cas_174 # 229 490
+nb_cas_175 # 224 766
+nb_cas_176 # 4 068 489
+#nb_cas_177_ou_plus # 1 670 485 = % des cas
+nb_cas_177 # 635 579
+nb_cas_178 # 458 249
+nb_cas_179 # 576 067
+nb_cas_180 # 590 :
+#nb_cas_181_ou_plus # ?
+nb_cas_travail_43_plus # 6 456 697
+nb_cas_travail_44_plus # 1 294 123
+nb_cas_travail_45_plus # 0
+
+
+
+calcul_situation_indiv("8/1/1964", "15/4/1983", verbose = 1)
+
 #%% création fichier cas carrière longue non transitoires
 
 # for Nm in range(1,13):
@@ -716,25 +822,27 @@ nb_cas_travail_45_plus # 0
 
 #%% création fichier cas carrière longue transitoires
 
-# for Ny in range(1961,1973):
-#     for Nm in range(1,13):
-#         for Nd in range(1,32):
-#             date_naissance = str(Nd)+"/"+str(Nm)+"/"+str(Ny)
-#             #print(date_naissance)
+for Ny in range(1961,1973):
+    for Nm in range(1,13):
+        for Nd in range(1,32):
+            date_naissance = str(Nd)+"/"+str(Nm)+"/"+str(Ny)
+            #print(date_naissance)
             
-#             for Ty in range(Ny+15,Ny+23):
-#                 for Tm in range(1,13):
-#                     for Td in range(1,32):
-#                         date_debut_travail = str(Td)+"/"+str(Tm)+"/"+str(Ty)
+            for Ty in range(Ny+15,Ny+23):
+                for Tm in range(1,13):
+                    for Td in range(1,32):
+                        date_debut_travail = str(Td)+"/"+str(Tm)+"/"+str(Ty)
     
-#                         try:
-#                             result = calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 0, enregistrer = 1, filename = "cas_CL_transitoires")
-#                             # if AP_nb_trim_reellement_cotises==175:
-#                             #     print(date_naissance,"\t\t",date_debut_travail,"\t\t",AP_nb_trim_reellement_cotises)
-#                         except ValueError:
-#                             pass
-#                         except Exception as e:
-#                             print("autre erreur")
-#                             err = e
+                        try:
+                            result = calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 0, enregistrer = 1, filename = "cas_CL_transitoires_1961_1972")
+                            # if AP_nb_trim_reellement_cotises==175:
+                            #     print(date_naissance,"\t\t",date_debut_travail,"\t\t",AP_nb_trim_reellement_cotises)
+                        except ValueError:
+                            pass
+                        except Exception as e:
+                            print("autre erreur")
+                            err = e
+
+
 
 
