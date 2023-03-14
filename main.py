@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import datetime, os
+import datetime, os, math
 from dateutil.relativedelta import relativedelta
 from pathlib import Path
 
@@ -257,14 +257,27 @@ def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enre
     else:
         AP_age_legal = AP_age_legal
     
+    # relativedelta() n'aime pas les float, donc il faut gérer ça et lui donner les mois
+    AP_age_legal_month = 0
+    if math.modf(AP_age_legal)[0] == 0:
+        AP_age_legal_month = 0
+    elif math.modf(AP_age_legal)[0] == 0.25:
+        AP_age_legal_month = 3
+    elif math.modf(AP_age_legal)[0] == 0.5:
+        AP_age_legal_month = 6
+    elif math.modf(AP_age_legal)[0] == 0.75:
+        AP_age_legal_month = 9
+    else:
+        raise Exception("Y'a un souci dans AP_age_legal")
+        
     # 5 - Calcul date légale de départ
     # Pas modifié par la réforme
     # Pour quelqu'un né entre le 2 et le 31 du mois, il peut partir le 1er du mois qui suit sont Xème anniversaire, où X = son âge légal de départ en retraite
     # Pour quelqu'un né le 1er du mois, il peut partir dès ce jour là
     if date_naissance.day == 1:
-        AP_date_legale = date_naissance + relativedelta(years=AP_age_legal)
+        AP_date_legale = date_naissance + relativedelta(years=math.floor(AP_age_legal), months=AP_age_legal_month)
     else:
-        AP_date_legale = (date_naissance.replace(day=1) + datetime.timedelta(days=32)).replace(day=1) + relativedelta(years=AP_age_legal)
+        AP_date_legale = (date_naissance.replace(day=1) + datetime.timedelta(days=32)).replace(day=1) + relativedelta(years=math.floor(AP_age_legal), months=AP_age_legal_month)
     
     # 6 - Calcul date de départ avec nombre de trimestres de cotisation
     AP_nb_trimestres_cotises = 0
@@ -698,19 +711,26 @@ nb_cas_travail_45_plus = 0
 nb_age_legal = 0
 nb_cotisation = 0
 
-for Ny in range(1961,1973):
+tesst = 0
+
+for Ny in range(1961,1969): # on ne va pas jusqu'en 1973 parce que la génération 1968 est la dernière qui, post réforme, fera l'objet de règles transitoires
     for Nm in range(1,13):
         for Nd in range(1,32):
             date_naissance = str(Nd)+"/"+str(Nm)+"/"+str(Ny)
+            try:
+                if datetime.datetime.strptime(date_naissance, '%d/%m/%Y') < datetime.datetime(1961, 9, 1):
+                    continue # on ne regarde pas les cas nés avant le 1er septembre 1961, car pas concernés par la réforme
+            except:
+                continue
             #print(date_naissance)
             
             for Ty in range(Ny+15,Ny+23):
                 for Tm in range(1,13):
                     for Td in range(1,32):
                         date_debut_travail = str(Td)+"/"+str(Tm)+"/"+str(Ty)
-    
+                            
                         try:
-                            result = calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 0)
+                            result = calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 0, enregistrer = 1, filename = "cas_CL_transitoires_1961_1972")
                             
                             total_cas += 1
                             if result["situation_changee"]:
@@ -734,7 +754,7 @@ for Ny in range(1961,1973):
                                 if result["AP_nb_trim_reellement_cotises"] == 178 : nb_cas_178 += 1
                                 if result["AP_nb_trim_reellement_cotises"] == 179 : 
                                     nb_cas_179 += 1
-                                    print(date_naissance, date_debut_travail)
+                                    #print(date_naissance, date_debut_travail)
                                     
                                 if result["AP_nb_trim_reellement_cotises"] == 180 : 
                                     nb_cas_180 += 1
@@ -753,28 +773,28 @@ for Ny in range(1961,1973):
                             print("autre erreur")
                             err = e
 
-total_cas # 9 340 302
-nb_cas_changed # 7 856 094
-nb_cas_171_ou_moins # 1 060 762
-nb_cas_172 # 359 791
-#nb_cas_173_ou_plus # 6 435 541 =  % des cas
-nb_cas_173 # 242 311
-nb_cas_174 # 229 490
-nb_cas_175 # 224 766
-nb_cas_176 # 4 068 489
-#nb_cas_177_ou_plus # 1 670 485 = % des cas
-nb_cas_177 # 635 579
-nb_cas_178 # 458 249
-nb_cas_179 # 576 067
-nb_cas_180 # 590 :
+total_cas # 7 828 038
+nb_cas_changed # 7 158 000
+nb_cas_171_ou_moins # 1 740 039
+nb_cas_172 # 210 846
+#nb_cas_173_ou_plus # 5 207 115 = 66.5 % des cas
+nb_cas_173 # 264390
+nb_cas_174 # 199741
+nb_cas_175 # 184817
+nb_cas_176 # 2639517
+#nb_cas_177_ou_plus # 1918650 = 24.5 % des cas
+nb_cas_177 # 806430
+nb_cas_178 # 551299
+nb_cas_179 # 560803
+nb_cas_180 # 118
 #nb_cas_181_ou_plus # ?
-nb_cas_travail_43_plus # 6 456 697
-nb_cas_travail_44_plus # 1 294 123
+nb_cas_travail_43_plus # 5166610
+nb_cas_travail_44_plus # 1330079
 nb_cas_travail_45_plus # 0
 
 
 
-calcul_situation_indiv("8/1/1964", "15/4/1983", verbose = 1)
+# calcul_situation_indiv("8/1/1964", "15/4/1983", verbose = 1)
 
 #%% création fichier cas carrière longue non transitoires
 
@@ -822,10 +842,15 @@ calcul_situation_indiv("8/1/1964", "15/4/1983", verbose = 1)
 
 #%% création fichier cas carrière longue transitoires
 
-for Ny in range(1961,1973):
+for Ny in range(1961,1969): # on ne va pas jusqu'en 1973 parce que la génération 1968 est la dernière qui, post réforme, fera l'objet de règles transitoires
     for Nm in range(1,13):
         for Nd in range(1,32):
             date_naissance = str(Nd)+"/"+str(Nm)+"/"+str(Ny)
+            try:
+                if datetime.datetime.strptime(date_naissance, '%d/%m/%Y') < datetime.datetime(1961, 9, 1):
+                    continue # on ne regarde pas les cas nés avant le 1er septembre 1961, car pas concernés par la réforme
+            except:
+                continue
             #print(date_naissance)
             
             for Ty in range(Ny+15,Ny+23):
@@ -842,6 +867,23 @@ for Ny in range(1961,1973):
                         except Exception as e:
                             print("autre erreur")
                             err = e
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
