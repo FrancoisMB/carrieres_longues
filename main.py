@@ -1,12 +1,6 @@
-# -*- coding: utf-8 -*-
-
 import datetime, os, math
 from dateutil.relativedelta import relativedelta
 from pathlib import Path
-
-# set le dossier de travail
-path_wd = r"D:\Code\Code_Python\calcul_carriere_longue_44"
-os.chdir(path_wd)
 
 def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enregistrer = 0, filename = "no_filename"):
     
