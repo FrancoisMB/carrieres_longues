@@ -4,12 +4,13 @@ from pathlib import Path
 
 def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enregistrer = 0, filename = "no_filename"):
     
-    # initialisation des fichiers
+    # initialisation du fichier
     if enregistrer:
         if not os.path.exists(filename + '.csv'):
             Path(filename + '.csv').touch()
             with open(filename + '.csv',"w") as f:
                 f.write("date_naissance;date_debut_travail;AV_cas_carriere_longue;AV_date_depart_selon_AP_age_legal;AV_date_depart_selon_nb_trim;AV_ce_qui_determine_vrai_age_depart;AV_age_reel_depart;AV_duree_reelle_cotis;AV_duree_reelle_travail;AP_cas_carriere_longue;AP_date_depart_selon_AP_age_legal;AP_date_depart_selon_nb_trim;AP_ce_qui_determine_vrai_age_depart;AP_age_reel_depart;AP_duree_reelle_cotis;AP_duree_reelle_travail")
+
 
     date_naissance = datetime.datetime.strptime(date_naissance, '%d/%m/%Y')
     date_debut_travail = datetime.datetime.strptime(date_debut_travail, '%d/%m/%Y')
@@ -115,18 +116,18 @@ def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enre
     if AV_nb_trimestres_cotises >= AV_total_trim_a_cotiser:
         # si le nb de trimestres cotisés est pile 172 (pour le cas général), c'est que 4 trimestres ont été cotisés la première année, toutes les années suivantes aussi
         # et 4 la dernière année. Notre cas aura tous ses trimestres le 31 décembre de sa dernière année de travail et pourra partir le 1er janvier suivant
-        AV_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AV_annees_civiles_pleinement_cotisees + 1, 1, 1) # c'est +1 parce que annees_civ_pleinement_cotisees = 43
+        AV_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AV_annees_civiles_pleinement_cotisees + 0, 1, 1) # c'est +1 parce que annees_civ_pleinement_cotisees = 43
     elif AV_nb_trimestres_cotises == AV_total_trim_a_cotiser-1:
         # si c'est 171, il lui manque un trimestre, il pourra partir au 1er avril
-        AV_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AV_annees_civiles_pleinement_cotisees + 2, 4, 1) # c'est +2 parce que annees_civ_pleinement_cotisees = 42
+        AV_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AV_annees_civiles_pleinement_cotisees + 1, 4, 1) # c'est +2 parce que annees_civ_pleinement_cotisees = 42
         AV_nb_trimestres_cotises +=1
     elif AV_nb_trimestres_cotises == AV_total_trim_a_cotiser-2:
         # si c'est 170, il lui manque deux trimestres, il pourra partir au 1er juillet
-        AV_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AV_annees_civiles_pleinement_cotisees + 2, 7, 1)
+        AV_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AV_annees_civiles_pleinement_cotisees + 1, 7, 1)
         AV_nb_trimestres_cotises += 2
     elif AV_nb_trimestres_cotises == AV_total_trim_a_cotiser-3:
         # si c'est 169, il lui manque trois trimestres, il pourra partir au 1er octobre
-        AV_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AV_annees_civiles_pleinement_cotisees + 2, 10, 1)
+        AV_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AV_annees_civiles_pleinement_cotisees + 1, 10, 1)
         AV_nb_trimestres_cotises += 3
     
     del AV_annees_civiles_pleinement_cotisees
@@ -310,18 +311,18 @@ def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enre
     if AP_nb_trimestres_cotises >= AP_total_trim_a_cotiser:
         # si le nb de trimestres cotisés est pile 172 (pour le cas général), c'est que 4 trimestres ont été cotisés la première année, toutes les années suivantes aussi
         # et 4 la dernière année. Notre cas aura tous ses trimestres le 31 décembre de sa dernière année de travail et pourra partir le 1er janvier suivant
-        AP_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AP_annees_civiles_pleinement_cotisees + 1, 1, 1) # c'est +1 parce que annees_civ_pleinement_cotisees = 43
+        AP_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AP_annees_civiles_pleinement_cotisees + 0, 1, 1) # c'est +1 parce que annees_civ_pleinement_cotisees = 43
     elif AP_nb_trimestres_cotises == AP_total_trim_a_cotiser-1:
         # si c'est 171, il lui manque un trimestre, il pourra partir au 1er avril
-        AP_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AP_annees_civiles_pleinement_cotisees + 2, 4, 1) # c'est +2 parce que annees_civ_pleinement_cotisees = 42
+        AP_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AP_annees_civiles_pleinement_cotisees + 1, 4, 1) # c'est +2 parce que annees_civ_pleinement_cotisees = 42
         AP_nb_trimestres_cotises +=1
     elif AP_nb_trimestres_cotises == AP_total_trim_a_cotiser-2:
         # si c'est 170, il lui manque deux trimestres, il pourra partir au 1er juillet
-        AP_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AP_annees_civiles_pleinement_cotisees + 2, 7, 1)
+        AP_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AP_annees_civiles_pleinement_cotisees + 1, 7, 1)
         AP_nb_trimestres_cotises += 2
     elif AP_nb_trimestres_cotises == AP_total_trim_a_cotiser-3:
         # si c'est 169, il lui manque trois trimestres, il pourra partir au 1er octobre
-        AP_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AP_annees_civiles_pleinement_cotisees + 2, 10, 1)
+        AP_date_depart_avec_nb_trim = datetime.datetime(date_debut_travail.year + AP_annees_civiles_pleinement_cotisees + 1, 10, 1)
         AP_nb_trimestres_cotises += 3
     
     del AP_annees_civiles_pleinement_cotisees
@@ -348,7 +349,8 @@ def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enre
         AP_nb_trim_reellement_cotises = 1
     # nb trimestres cotisés années civiles pleines
     # nb années du 01/01/(date_debut_travail.year + 1) et 31/12/(AP_date_depart_reelle.year - 1) compris (donc 1/1/AP_date_depart_reelle.year)
-    AP_nb_trim_reellement_cotises += relativedelta(datetime.datetime(AP_date_depart_reelle.year,1,1), datetime.datetime(date_debut_travail.year+1,1,1)).years*4
+    AP_nb_trim_reellement_cotises += relativedelta(datetime.datetime(AP_date_depart_reelle.year,1,1), datetime.datetime(date_debut_travail.year+1,1,1)).years*4   
+    
     # nb trimestres cotisés dernière année
     # si date depart réelle après 1er avril, +1 trimestre, après 1 juillet, +2 trimestres, après 1er octobre, +3 trimestres
     if AP_date_depart_reelle >= datetime.datetime(AP_date_depart_reelle.year, 10, 1):
@@ -502,80 +504,90 @@ date_debut_travail = "13/7/2014"
 # calcul_situation_indiv(date_naissance, date_debut_travail)
 
 date_naissance = "02/01/2000"
-date_debut_travail = "15/11/2021"
+date_debut_travail = "11/8/2021"
 #calcul_situation_indiv(date_naissance, date_debut_travail)
 
+date_naissance = "02/01/2000"
+date_debut_travail = "13/12/2018"
+# calcul_situation_indiv(date_naissance, date_debut_travail)
 
-#%% calculs sur les cas généraux
 
-# total_cas = 0
-# nb_cas_changed = 0
-# nb_cas_171_ou_moins = 0
-# nb_cas_172 = 0
-# nb_cas_173 = 0
-# nb_cas_174 = 0
-# nb_cas_175 = 0
-# nb_cas_176 = 0
-# nb_cas_177_ou_plus = 0
-# nb_cas_travail_43_ou_plus = 0
-# nb_cas_travail_44_ou_plus = 0
-# nb_cas_travail_45_ou_plus = 0
+#%% calculs sur les cas généraux non CL
 
-# for Nm in range(1,13):
-#     for Nd in range(1,32):
-#         date_naissance = str(Nd)+"/"+str(Nm)+"/2000"
-#         #print(date_naissance)
+total_cas = 0
+nb_cas_changed = 0
+nb_cas_171_ou_moins = 0
+nb_cas_172 = 0
+nb_cas_173 = 0
+nb_cas_174 = 0
+nb_cas_175 = 0
+nb_cas_176 = 0
+nb_cas_177_ou_plus = 0
+nb_cas_travail_43_ou_plus = 0
+nb_cas_travail_44_ou_plus = 0
+nb_cas_travail_45_ou_plus = 0
+
+tous_les_cas = 1
+
+for Nm in range(1,13):
+    for Nd in range(1,32):
+        date_naissance = str(Nd)+"/"+str(Nm)+"/2000"
+        #print(date_naissance)
         
-#         for Ty in range(2022,2023):
-#             for Tm in range(1,13):
-#                 for Td in range(1,32):
-#                     date_debut_travail = str(Td)+"/"+str(Tm)+"/"+str(Ty)
+        for Ty in range(2022,2023):
+            for Tm in range(1,13):
+                for Td in range(1,32):
+                    date_debut_travail = str(Td)+"/"+str(Tm)+"/"+str(Ty)
 
-#                     try:
-#                         result = calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 0)
+                    try:
+                        result = calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 0)
                         
-#                         total_cas += 1
-#                         if result["situation_changee"]:
-#                             nb_cas_changed += 1
-#                             if result["AP_nb_trim_reellement_cotises"] <= 171 : nb_cas_171_ou_moins += 1
-#                             if result["AP_nb_trim_reellement_cotises"] == 172 : nb_cas_172 += 1
-#                             if result["AP_nb_trim_reellement_cotises"] == 173 : nb_cas_173 += 1
-#                             if result["AP_nb_trim_reellement_cotises"] >= 173 : nb_cas_173 += 1
-#                             if result["AP_nb_trim_reellement_cotises"] == 174 : nb_cas_174 += 1
-#                             if result["AP_nb_trim_reellement_cotises"] == 175 : nb_cas_175 += 1
-#                             if result["AP_nb_trim_reellement_cotises"] == 176 : nb_cas_176 += 1
-#                             if result["AP_nb_trim_reellement_cotises"] > 176 : 
-#                                 nb_cas_177_ou_plus += 1
-#                                 print("176+", date_naissance, date_debut_travail)
+                        total_cas += 1
+                        if result["situation_changee"]:
+                            nb_cas_changed += 1
+                            
+                        if result["situation_changee"] or tous_les_cas:
+                            if result["AP_nb_trim_reellement_cotises"] <= 171 : nb_cas_171_ou_moins += 1
+                            if result["AP_nb_trim_reellement_cotises"] == 172 : nb_cas_172 += 1
+                            if result["AP_nb_trim_reellement_cotises"] == 173 : nb_cas_173 += 1
+                            if result["AP_nb_trim_reellement_cotises"] >= 173 : nb_cas_173 += 1
+                            if result["AP_nb_trim_reellement_cotises"] == 174 : nb_cas_174 += 1
+                            if result["AP_nb_trim_reellement_cotises"] == 175 : nb_cas_175 += 1
+                            if result["AP_nb_trim_reellement_cotises"] == 176 : nb_cas_176 += 1
+                            if result["AP_nb_trim_reellement_cotises"] > 176 : 
+                                nb_cas_177_ou_plus += 1
+                                print("176+", date_naissance, date_debut_travail)
 
-#                             if result["AP_duree_reelle_travail.years"] >= 43 : 
-#                                 nb_cas_travail_43_ou_plus += 1
-#                             if result["AP_duree_reelle_travail.years"] >= 44 : nb_cas_travail_44_ou_plus += 1
-#                             if result["AP_duree_reelle_travail.years"] >= 45 : 
-#                                 nb_cas_travail_45_ou_plus += 1
-#                                 print("45+", date_naissance, date_debut_travail)
+                            if result["AP_duree_reelle_travail.years"] >= 43 : 
+                                nb_cas_travail_43_ou_plus += 1
+                            if result["AP_duree_reelle_travail.years"] >= 44 : nb_cas_travail_44_ou_plus += 1
+                            if result["AP_duree_reelle_travail.years"] >= 45 : 
+                                nb_cas_travail_45_ou_plus += 1
+                                print("45+", date_naissance, date_debut_travail)
 
-#                     except ValueError:
-#                         pass
-#                     except Exception as e:
-#                         print("autre erreur")
-#                         err = e
+                    except ValueError:
+                        pass
+                    except Exception as e:
+                        print("autre erreur")
+                        err = e
 
-# total_cas # 365 * 366 = 133590
-# nb_cas_changed # 133590
-# nb_cas_171_ou_moins # 126270
-# nb_cas_172 # 7320
-# nb_cas_173 # 0
-# nb_cas_174 # 0
-# nb_cas_175 # 0
-# nb_cas_176 # 0
-# nb_cas_177_ou_plus # 0
-# nb_cas_travail_43_ou_plus # 30 : les gens nés entre le 2 décembre et le 31 décembre inclus, et qui ont commencé le 1er janvier 2022 : ils ne pourront partir qu'à compter du 1er janvier 2065 et auront donc travaillé pile 43 ans
-# nb_cas_travail_44_ou_plus # 0
-# nb_cas_travail_45_ou_plus # 0
+# Avec tous les cas = 0 (donc que les cas changés par la réforme)
+total_cas # 365 * 366 = 133590
+nb_cas_changed # 133590
+nb_cas_171_ou_moins # 126270
+nb_cas_172 # 7320
+nb_cas_173 # 0
+nb_cas_174 # 0
+nb_cas_175 # 0
+nb_cas_176 # 0
+nb_cas_177_ou_plus # 0
+nb_cas_travail_43_ou_plus # 30 : les gens nés entre le 2 décembre et le 31 décembre inclus, et qui ont commencé le 1er janvier 2022 : ils ne pourront partir qu'à compter du 1er janvier 2065 et auront donc travaillé pile 43 ans
+nb_cas_travail_44_ou_plus # 0
+nb_cas_travail_45_ou_plus # 0
 
+# Même chose avec tous les cas = 1
 
-#%% calculs sur les cas CL
+#%% calculs sur les cas généraux CL
 
 total_cas = 0
 nb_cas_changed = 0
@@ -598,6 +610,8 @@ nb_cas_travail_45_plus = 0
 nb_age_legal = 0
 nb_cotisation = 0
 
+tous_les_cas = True
+
 for Nm in range(1,13):
     for Nd in range(1,32):
         date_naissance = str(Nd)+"/"+str(Nm)+"/2000"
@@ -615,15 +629,18 @@ for Nm in range(1,13):
                         if result["situation_changee"]:
                             nb_cas_changed += 1
                             
+                        if result["situation_changee"] or tous_les_cas:
                             if result["AP_nb_trim_reellement_cotises"] <= 171 : 
                                 nb_cas_171_ou_moins += 1
                                 # print("171-", date_naissance, date_debut_travail)
-                            if result["AP_nb_trim_reellement_cotises"] == 172 : nb_cas_172 += 1
+                            if result["AP_nb_trim_reellement_cotises"] == 172 : 
+                                nb_cas_172 += 1
                             if result["AP_nb_trim_reellement_cotises"] == 173 : nb_cas_173 += 1
                             if result["AP_nb_trim_reellement_cotises"] >= 173 : 
                                 nb_cas_173_ou_plus += 1
                                 if result["AP_vraie_cause_depart"] == 'duree_cotisation':
                                     nb_cotisation += 1
+                                    print(date_naissance, date_debut_travail)
                                 elif result["AP_vraie_cause_depart"] == 'age_legal':
                                     nb_age_legal += 1
                             if result["AP_nb_trim_reellement_cotises"] == 174 : nb_cas_174 += 1
@@ -651,15 +668,16 @@ for Nm in range(1,13):
                         print("autre erreur")
                         err = e
 
+# Avec tous les cas = 0 (donc que les cas changés par la réforme)
 total_cas # 935862 (dans l'idée, c'est 365 * 365 * 7, mais en vérité, c'est 366 * (6*365 + 2*366) parce que 2000, 2016 et 2020 sont bissextiles)
-nb_cas_changed # 357095
-nb_cas_171_ou_moins # 24003 : que des cas de gens ayant commencé dans leur 21ème année, mais pas assez tôt pour être carrière longue, qui peuvent donc partir à 64 ans sans avoir leur 172 trimestres
-nb_cas_172 # 32346
-#nb_cas_173_ou_plus # 300746 = 32,14 % des cas
-nb_cas_173 # 37331
-nb_cas_174 # 34572
-nb_cas_175 # 12754
-nb_cas_176 # 145954
+nb_cas_changed # 482495
+nb_cas_171_ou_moins # 27723 : que des cas de gens ayant commencé dans leur 21ème année, mais pas assez tôt pour être carrière longue, qui peuvent donc partir à 64 ans sans avoir leur 172 trimestres
+nb_cas_172 # 110564
+nb_cas_173_ou_plus # 344208 = 36,8 % des cas
+nb_cas_173 # 97233
+nb_cas_174 # 91715
+nb_cas_175 # 51613
+nb_cas_176 # 33512
 #nb_cas_177_ou_plus # 70135 = 7,49% des cas
 nb_cas_177 # 31811
 nb_cas_178 # 29052
@@ -673,13 +691,35 @@ nb_cas_180 # 118 : nés entre 2 et 30 septembre 2000, qui ont commencé à trava
             # Ils sont CL 20. S'ils avaient commencé avant, ils seraient CL 18
             # Artefact de calcul dû à ma simplification "un mois plein de travail = 150 heures au SMIC"
 #nb_cas_181_ou_plus # 0
-nb_cas_travail_43_plus # 295703
+nb_cas_travail_43_plus # 296130
 nb_cas_travail_44_plus # 59067
 nb_cas_travail_45_plus # 0
 
 
-
-
+# Avec tous les cas = 1 (donc y compris les cas PAS changés par la réforme)
+total_cas # 935862 (dans l'idée, c'est 365 * 365 * 7, mais en vérité, c'est 366 * (6*365 + 2*366) parce que 2000, 2016 et 2020 sont bissextiles)
+nb_cas_changed # 482495
+nb_cas_171_ou_moins # 31443 : que des cas de gens ayant commencé dans leur 21ème année, mais pas assez tôt pour être carrière longue, qui peuvent donc partir à 64 ans sans avoir leur 172 trimestres
+nb_cas_172 # 270751
+nb_cas_173_ou_plus # 633668 = 67,7 % des cas
+nb_cas_173 # 159681
+nb_cas_174 # 151342
+nb_cas_175 # 107993
+nb_cas_176 # 74169
+#nb_cas_177_ou_plus # 140483 = 15% des cas
+nb_cas_177 # 63714
+nb_cas_178 # 58196
+nb_cas_179 # 18337
+# nés du 2 juin au 31 aout 2000 qui ont commencé à travailler le 30 novembre ou le 1er décembre 2017
+# nés en septembre 2000 qui ont commencé à travailler entre le 2 et le 31 décembre 2017 <= SUJET
+# nés en septembre 2000 qui ont commencé à travailler entre le 1er janvier et le 1er septembre 2018 <= SUJET
+# nés en octobre, novembre 2000 qui ont commencé à travailler le 31 août ou le 1er septembre 2018
+# nés en décembre 2000 qui ont commencé à travailler entre le 2 septembre et le 1er octobre 2018 <= SUJET
+nb_cas_180 # 236 
+#nb_cas_181_ou_plus # 0
+nb_cas_travail_43_plus # 575070
+nb_cas_travail_44_plus # 117736
+nb_cas_travail_45_plus # 0
 
 
 #%% calculs sur les cas CL transitoires
@@ -705,7 +745,7 @@ nb_cas_travail_45_plus = 0
 nb_age_legal = 0
 nb_cotisation = 0
 
-tesst = 0
+tous_les_cas = 1
 
 for Ny in range(1961,1969): # on ne va pas jusqu'en 1973 parce que la génération 1968 est la dernière qui, post réforme, fera l'objet de règles transitoires
     for Nm in range(1,13):
@@ -724,12 +764,13 @@ for Ny in range(1961,1969): # on ne va pas jusqu'en 1973 parce que la générati
                         date_debut_travail = str(Td)+"/"+str(Tm)+"/"+str(Ty)
                             
                         try:
-                            result = calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 0, enregistrer = 1, filename = "cas_CL_transitoires_1961_1972")
+                            result = calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 0, enregistrer = 0, filename = "cas_CL_transitoires_1961_1972")
                             
                             total_cas += 1
                             if result["situation_changee"]:
                                 nb_cas_changed += 1
                                 
+                            if result["situation_changee"] or tous_les_cas:
                                 if result["AP_nb_trim_reellement_cotises"] <= 171 : 
                                     nb_cas_171_ou_moins += 1
                                     # print("171-", date_naissance, date_debut_travail)
@@ -767,6 +808,7 @@ for Ny in range(1961,1969): # on ne va pas jusqu'en 1973 parce que la générati
                             print("autre erreur")
                             err = e
 
+# Avec tous les cas = 0 (donc que les cas changés par la réforme)
 total_cas # 7 828 038
 nb_cas_changed # 7 158 000
 nb_cas_171_ou_moins # 1 740 039
@@ -781,11 +823,30 @@ nb_cas_177 # 806430
 nb_cas_178 # 551299
 nb_cas_179 # 560803
 nb_cas_180 # 118
-#nb_cas_181_ou_plus # ?
+#nb_cas_181_ou_plus # 0
 nb_cas_travail_43_plus # 5166610
 nb_cas_travail_44_plus # 1330079
 nb_cas_travail_45_plus # 0
 
+# Avec tous les cas = 1 (donc y compris les cas PAS changés par la réforme)
+total_cas # 7 828 038
+nb_cas_changed # 5 635 469
+nb_cas_171_ou_moins # 2 161 839
+nb_cas_172 # 1 505 540
+#nb_cas_173_ou_plus # 4 160 659 = 53,1 % des cas
+nb_cas_173 # 1 121 845
+nb_cas_174 # 983 602
+nb_cas_175 # 1 024 116
+nb_cas_176 # 405 082
+#nb_cas_177_ou_plus # 626014 = 7.9 % des cas
+nb_cas_177 # 296 766
+nb_cas_178 # 245 806
+nb_cas_179 # 82 380
+nb_cas_180 # 1062
+#nb_cas_181_ou_plus # 0
+nb_cas_travail_43_plus # 3 544 678
+nb_cas_travail_44_plus # 525 513
+nb_cas_travail_45_plus # 0
 
 
 # calcul_situation_indiv("8/1/1964", "15/4/1983", verbose = 1)
@@ -861,24 +922,4 @@ for Ny in range(1961,1969): # on ne va pas jusqu'en 1973 parce que la générati
                         except Exception as e:
                             print("autre erreur")
                             err = e
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
