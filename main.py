@@ -2,6 +2,8 @@ import datetime, os, math
 from dateutil.relativedelta import relativedelta
 from pathlib import Path
 
+### I - Fonction de calcul des situations individuelles ###
+
 def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enregistrer = 0, filename = "no_filename"):
     
     # initialisation du fichier
@@ -48,31 +50,64 @@ def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enre
     # 3 - Ici, on entre les âges légaux de départ, et les durées de cotisation requises, pour les générations transitoires
     # Source : dossier de presse https://www.gouvernement.fr/upload/media/content/0001/05/1548a2feb27d6e5ed4d637eb051bb95daeb2200f.pdf
     # Tableau page 18, colonnes 3    
-    AV_total_trim_a_cotiser = 172
-    AV_age_legal = 62
-
-    if date_naissance.year <= 1960:         AV_total_trim_a_cotiser = 167
-    elif date_naissance.year == 1961:       AV_total_trim_a_cotiser = 168
-    elif date_naissance.year == 1962:       AV_total_trim_a_cotiser = 168
-    elif date_naissance.year == 1963:       AV_total_trim_a_cotiser = 168
-    elif date_naissance.year == 1964:       AV_total_trim_a_cotiser = 169
-    elif date_naissance.year == 1965:       AV_total_trim_a_cotiser = 169
-    elif date_naissance.year == 1966:       AV_total_trim_a_cotiser = 169
-    elif date_naissance.year == 1967:       AV_total_trim_a_cotiser = 170
-    elif date_naissance.year == 1968:       AV_total_trim_a_cotiser = 170
-    elif date_naissance.year == 1969:       AV_total_trim_a_cotiser = 170
-    elif date_naissance.year == 1970:       AV_total_trim_a_cotiser = 171
-    elif date_naissance.year == 1971:       AV_total_trim_a_cotiser = 171
-    elif date_naissance.year == 1972:       AV_total_trim_a_cotiser = 171
-    elif date_naissance.year >= 1973:       AV_total_trim_a_cotiser = 172
 
     # 4 - Ensuite, on rectifie l'âge légal de départ à la retraite pour les cas carrière longue
-    if AV_CL == "16":
-        AV_age_legal = 58
-    elif AV_CL == "20":
-        AV_age_legal = 60
-    else:
-        AV_age_legal = 62
+    # Source : https://www.service-public.fr/particuliers/vosdroits/F13845
+    AV_age_legal = 62
+    AV_total_trim_a_cotiser = 172
+    
+    # 4.1 - On rectifie pour les cas transitoires
+    if date_naissance.year <= 1960:         
+        AV_total_trim_a_cotiser = 167
+        if AV_CL == "16":                         # de là            # TODO
+            AV_age_legal = 58
+            AV_total_trim_a_cotiser = 180
+        elif AV_CL == "20":
+            AV_age_legal = 60
+            AV_total_trim_a_cotiser = 172
+        else:
+            AV_age_legal = 62
+            AV_total_trim_a_cotiser = 172         # à là, c'est probablement faux, mais le code n'est pas fait pour bien gérer les cas avant 1960
+    elif date_naissance.year == 1961 or date_naissance.year == 1962 or date_naissance.year == 1963:       
+        AV_total_trim_a_cotiser = 168
+        if AV_CL == "16":
+            AV_age_legal = 58
+            AV_total_trim_a_cotiser = 176
+        elif AV_CL == "20":
+            AV_age_legal = 60
+            AV_total_trim_a_cotiser = 168
+    elif date_naissance.year == 1964 or date_naissance.year == 1965 or date_naissance.year == 1966:       
+        AV_total_trim_a_cotiser = 169
+        if AV_CL == "16":
+            AV_age_legal = 58
+            AV_total_trim_a_cotiser = 177
+        elif AV_CL == "20":
+            AV_age_legal = 60
+            AV_total_trim_a_cotiser = 169
+    elif date_naissance.year == 1967 or date_naissance.year == 1968 or date_naissance.year == 1969:
+        AV_total_trim_a_cotiser = 170
+        if AV_CL == "16":
+            AV_age_legal = 58
+            AV_total_trim_a_cotiser = 178
+        elif AV_CL == "20":
+            AV_age_legal = 60
+            AV_total_trim_a_cotiser = 170
+    elif date_naissance.year == 1970 or date_naissance.year == 1971 or date_naissance.year == 1972:
+        AV_total_trim_a_cotiser = 171
+        if AV_CL == "16":
+            AV_age_legal = 58
+            AV_total_trim_a_cotiser = 179
+        elif AV_CL == "20":
+            AV_age_legal = 60
+            AV_total_trim_a_cotiser = 171
+    elif date_naissance.year >= 1973:       
+        if AV_CL == "16":
+            AV_age_legal = 58
+            AV_total_trim_a_cotiser = 180
+        elif AV_CL == "20":
+            AV_age_legal = 60
+            AV_total_trim_a_cotiser = 172
+    
     
     # 5 - Calcul date légale de départ
     # Pour quelqu'un né entre le 2 et le 31 du mois, il peut partir le 1er du mois qui suit sont Xème anniversaire, où X = son âge légal de départ en retraite
@@ -164,7 +199,8 @@ def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enre
     
     # 9 - Calcul de la durée réellement travaillée
     AV_duree_reelle_travail = relativedelta(AV_date_depart_reelle, date_debut_travail)
-    
+    AV_duree_reelle_travail_days = (AV_date_depart_reelle - date_debut_travail).days
+
 
 
 
@@ -216,7 +252,7 @@ def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enre
         AP_total_trim_a_cotiser = 168
     elif date_naissance.year == 1961: 
         AP_age_legal = 62.25
-        AP_total_trim_a_cotiser = 169
+        AP_total_trim_a_cotiser = 169            
     elif date_naissance.year == 1962:
         AP_age_legal = 62.5
         AP_total_trim_a_cotiser = 169
@@ -241,8 +277,13 @@ def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enre
     
     # 4 - Ensuite, on rectifie l'âge légal de départ à la retraite pour les cas carrière longue
     # Modifié par la réforme
+    # TODO : chercher si je trouve la réponse aux trois lignes de commentaires suivantes :
+    # Par ailleurs, je fais l'hypothèse, peut être fausse, que l'accélération de Touraine est appliquée de la même manière aux cas CL18, 20 et 21
+    # Pour les cas CL 16, pour lesquels la durée de cotisation en droit actuel est comprise en 176 et 180 T (https://www.service-public.fr/particuliers/vosdroits/F13845)
+    # Je fais l'hypothèse qu'elle est immédiatement abaissée à 172 T
     if AP_CL == "16":
         AP_age_legal = 58
+        AP_total_trim_a_cotiser = 172
     elif AP_CL == "18":
         AP_age_legal = 60
     elif AP_CL == "20":
@@ -363,9 +404,7 @@ def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enre
     # 9 - Calcul de la durée réellement travaillée
     # Pas modifié par la réforme
     AP_duree_reelle_travail = relativedelta(AP_date_depart_reelle, date_debut_travail)
-    
-    
-    
+    AP_duree_reelle_travail_days = (AP_date_depart_reelle - date_debut_travail).days
     
     
     
@@ -373,17 +412,22 @@ def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enre
     AV_vraie_cause_depart =""
     AP_vraie_cause_depart =""
 
-    if AV_date_depart_reelle == AP_date_depart_reelle:
-        #return 0
-        situation_changee = False
+    if AV_date_depart_reelle == AP_date_depart_reelle and AV_nb_trim_reellement_cotises == AP_nb_trim_reellement_cotises and AV_duree_reelle_travail_days == AP_duree_reelle_travail_days:
+        situation_changee = "non"
         if verbose:
             print(" ")
             print("RIEN NE CHANGE")
         else:
             pass
     else:
-        situation_changee = True
+        if AV_date_depart_reelle < AP_date_depart_reelle or AV_nb_trim_reellement_cotises < AP_nb_trim_reellement_cotises or AV_duree_reelle_travail_days < AP_duree_reelle_travail_days:
+            # si la date de départ a reculé après réforme, ou le nombre de trimestres réellement cotisés
+            # ou la durée réelle de travail, alors le cas est marqué comme "dégradé". Et sinon, on considère que la situation a été améliorée
+            situation_changee = "dégradée"
+        else:
+            situation_changee = "améliorée"
         
+       
     if AV_date_depart_reelle == AV_date_depart_avec_nb_trim:
         AV_vraie_cause_depart = "duree_cotisation"
     elif AV_date_depart_reelle == AV_date_legale:
@@ -425,7 +469,7 @@ def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enre
         print("Âge réel de départ =", AP_age_reel)
         print("Durée réelle de cotis =", AP_nb_trim_reellement_cotises/4)
         print("Durée reelle de travail =", AP_duree_reelle_travail)
-        print(" ")
+        print("Situation changée :", situation_changee)
         print(" ")
 
   
@@ -487,11 +531,10 @@ def calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 1, enre
     output_dict["AP_duree_reelle_travail.days"] = AP_duree_reelle_travail.days
     
     output_dict["situation_changee"] = situation_changee
-    output_dict["situation_changee"] = situation_changee
 
     return output_dict
 
-#%% Simulations individuelles
+#%% Simulations individuelles pour mes tests
 
 # Dates au format "jj/mm/aaaa"
 date_naissance = "2/09/2000"
@@ -507,15 +550,24 @@ date_naissance = "02/01/2000"
 date_debut_travail = "11/8/2021"
 #calcul_situation_indiv(date_naissance, date_debut_travail)
 
-date_naissance = "02/01/2000"
-date_debut_travail = "13/12/2018"
+date_naissance = "05/01/2000"
+date_debut_travail = "31/12/2021"
 # calcul_situation_indiv(date_naissance, date_debut_travail)
 
 
-#%% calculs sur les cas généraux non CL
+#%% 
 
+### II - Simulations (générations non transitoires,  cas général (non carrières longues)) ###
+
+# calculs pour : 
+    # les situations générales (donc pas les années transitoires, autrement dit, tout le monde né après 1969
+    # des gens non carrière longue (c'est à dire qui ont commencé, grosso modo, après 21 ans)
+
+# initialisation des variables, ne pas prêter attention
 total_cas = 0
 nb_cas_changed = 0
+nb_cas_degraded = 0
+nb_cas_ameliored = 0
 nb_cas_171_ou_moins = 0
 nb_cas_172 = 0
 nb_cas_173 = 0
@@ -543,10 +595,14 @@ for Nm in range(1,13):
                         result = calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 0)
                         
                         total_cas += 1
-                        if result["situation_changee"]:
+                        if result["situation_changee"] != "non":
                             nb_cas_changed += 1
+                        if result["situation_changee"] == "dégradée":
+                            nb_cas_degraded +=1
+                        if result["situation_changee"] == "améliorée":
+                            nb_cas_ameliored +=1
                             
-                        if result["situation_changee"] or tous_les_cas:
+                        if result["situation_changee"] != "non" or tous_les_cas:
                             if result["AP_nb_trim_reellement_cotises"] <= 171 : nb_cas_171_ou_moins += 1
                             if result["AP_nb_trim_reellement_cotises"] == 172 : nb_cas_172 += 1
                             if result["AP_nb_trim_reellement_cotises"] == 173 : nb_cas_173 += 1
@@ -571,26 +627,41 @@ for Nm in range(1,13):
                         print("autre erreur")
                         err = e
 
-# Avec tous les cas = 0 (donc que les cas changés par la réforme)
-total_cas # 365 * 366 = 133590
-nb_cas_changed # 133590
-nb_cas_171_ou_moins # 126270
-nb_cas_172 # 7320
+# résultats
+
+total_cas # nombre de situations simulées : 365 * 366 = 133590
+nb_cas_changed # nombre de situations modifiées par la réforme : 133590, soit 100%
+nb_cas_degraded # nombre de situations dégradées par la réforme : 133590, soit 100%
+nb_cas_ameliored # nombre de situations améliorées par la réforme : 0
+
+# Résultats pour les situations modifiées par la réforme
+nb_cas_171_ou_moins # 126270   # assez logiquement, l'essentiel des situations pourra partir avant 172 trimestres cotisés (puisque ce n'est pas une condition exigée quand on est pas carrière longue)
+nb_cas_172 # 73
 nb_cas_173 # 0
 nb_cas_174 # 0
 nb_cas_175 # 0
 nb_cas_176 # 0
 nb_cas_177_ou_plus # 0
-nb_cas_travail_43_ou_plus # 30 : les gens nés entre le 2 décembre et le 31 décembre inclus, et qui ont commencé le 1er janvier 2022 : ils ne pourront partir qu'à compter du 1er janvier 2065 et auront donc travaillé pile 43 ans
+nb_cas_travail_43_ou_plus # 30 : les gens nés entre le 2 décembre et le 31 décembre inclus, et qui ont commencé le 1er janvier 2022 : ils ne pourront partir qu'à compter du 1er janvier 2065 et auront donc travaillé pile 43 ans. Anecdotique.
 nb_cas_travail_44_ou_plus # 0
 nb_cas_travail_45_ou_plus # 0
 
-# Même chose avec tous les cas = 1
+# Résultats pour l'ensemble des situations, qu'elles soient modifiées par la réforme
+# Même résultats qu'au dessus, ce qui est logique, vu que toutes les situations sont modifiées par la réforme
 
-#%% calculs sur les cas généraux CL
+#%% 
 
+### III - Simulations (générations non transitoires, carrières longues) ###
+
+# calculs pour : 
+    # les situations générales (donc pas les années transitoires, autrement dit, tout le monde né après 1969
+    # des gens qui ont commencé, avant le 31 décembre de l'année de leur 21 ans (c'est à dire en situation de carrière longue pour la plupart)
+
+# initialisation des variables, ne pas prêter attention
 total_cas = 0
 nb_cas_changed = 0
+nb_cas_degraded = 0
+nb_cas_ameliored = 0
 nb_cas_171_ou_moins = 0
 nb_cas_172 = 0
 nb_cas_173 = 0
@@ -610,7 +681,7 @@ nb_cas_travail_45_plus = 0
 nb_age_legal = 0
 nb_cotisation = 0
 
-tous_les_cas = True
+tous_les_cas = 1
 
 for Nm in range(1,13):
     for Nd in range(1,32):
@@ -626,10 +697,14 @@ for Nm in range(1,13):
                         result = calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 0)
                         
                         total_cas += 1
-                        if result["situation_changee"]:
+                        if result["situation_changee"] != "non":
                             nb_cas_changed += 1
+                        if result["situation_changee"] == "dégradée":
+                            nb_cas_degraded +=1
+                        if result["situation_changee"] == "améliorée":
+                            nb_cas_ameliored +=1
                             
-                        if result["situation_changee"] or tous_les_cas:
+                        if result["situation_changee"] != "non" or tous_les_cas:
                             if result["AP_nb_trim_reellement_cotises"] <= 171 : 
                                 nb_cas_171_ou_moins += 1
                                 # print("171-", date_naissance, date_debut_travail)
@@ -666,22 +741,30 @@ for Nm in range(1,13):
                         pass
                     except Exception as e:
                         print("autre erreur")
+                        print(date_naissance, date_debut_travail)
                         err = e
 
-# Avec tous les cas = 0 (donc que les cas changés par la réforme)
-total_cas # 935862 (dans l'idée, c'est 365 * 365 * 7, mais en vérité, c'est 366 * (6*365 + 2*366) parce que 2000, 2016 et 2020 sont bissextiles)
-nb_cas_changed # 482495
-nb_cas_171_ou_moins # 27723 : que des cas de gens ayant commencé dans leur 21ème année, mais pas assez tôt pour être carrière longue, qui peuvent donc partir à 64 ans sans avoir leur 172 trimestres
-nb_cas_172 # 110564
-nb_cas_173_ou_plus # 344208 = 36,8 % des cas
-nb_cas_173 # 97233
-nb_cas_174 # 91715
-nb_cas_175 # 51613
-nb_cas_176 # 33512
-#nb_cas_177_ou_plus # 70135 = 7,49% des cas
+# résultats
+
+total_cas #  nombre de situations simulées : 935862 (dans l'idée, c'est 365 * 365 * 7, mais en vérité, c'est 366 * (6*365 + 2*366) parce que 2000, 2016 et 2020 sont bissextiles)
+nb_cas_changed # nombre de situations modifiées par la réforme : 629673, soit 67,3 % 
+nb_cas_degraded # nombre de situations dégradées par la réforme : 482495, soit 51,6 %
+nb_cas_ameliored # nombre de situations améliorées par la réforme : 147178, soit 15,7 % => ce sont très probablement les gens en CL 16 ans, à qui on va arrêter de demander 45 annuités pour ne leur en demander que 43
+
+# Résultats pour les situations modifiées par la réforme (= variable tous_les_cas à 0)
+nb_cas_171_ou_moins # nombre de situations qui vont cotiser 171 trimestres ou moins : 29583 : que des cas de gens ayant commencé dans leur 21ème année, mais pas assez tôt pour être carrière longue, qui peuvent donc partir à 64 ans sans avoir leur 172 trimestres, puisque pour les non CL, ce n'est pas une exigence
+nb_cas_172 # nombre de situations qui vont cotiser 172 trimestres pile : 170421
+nb_cas_173_ou_plus # nombre de situations qui vont cotiser 173 trimestres ou plus (donc plus que 43 ans) : 429669 = 45.9 % des cas
+nb_cas_173 # 126162
+nb_cas_174 # 117823
+nb_cas_175 # 74717
+nb_cas_176_ou_plus = nb_cas_176 + nb_cas_177 + nb_cas_178 + nb_cas_179 + nb_cas_180
+nb_cas_176_ou_plus # nombre de situations qui vont cotiser 176 trimestres ou plus (donc 44 ou plus) : 110 849 = 11,8 % des situations donnent une durée de cotisation de 44 ans ou plus
+nb_cas_176 # 40832
 nb_cas_177 # 31811
 nb_cas_178 # 29052
 nb_cas_179 # 9154
+# exemples de cas qui vont cotiser 179 trimestres (44 ans et 3 trimestres) :
 # nés du 2 juin au 31 aout 2000 qui ont commencé à travailler le 30 novembre ou le 1er décembre 2017
 # nés en septembre 2000 qui ont commencé à travailler entre le 2 et le 31 décembre 2017 <= SUJET
 # nés en septembre 2000 qui ont commencé à travailler entre le 1er janvier et le 1er septembre 2018 <= SUJET
@@ -696,25 +779,19 @@ nb_cas_travail_44_plus # 59067
 nb_cas_travail_45_plus # 0
 
 
-# Avec tous les cas = 1 (donc y compris les cas PAS changés par la réforme)
-total_cas # 935862 (dans l'idée, c'est 365 * 365 * 7, mais en vérité, c'est 366 * (6*365 + 2*366) parce que 2000, 2016 et 2020 sont bissextiles)
-nb_cas_changed # 482495
-nb_cas_171_ou_moins # 31443 : que des cas de gens ayant commencé dans leur 21ème année, mais pas assez tôt pour être carrière longue, qui peuvent donc partir à 64 ans sans avoir leur 172 trimestres
-nb_cas_172 # 270751
-nb_cas_173_ou_plus # 633668 = 67,7 % des cas
+# Résultats pour l'ensemble des situations, qu'elles soient modifiées par la réforme ou pas (= variable tous_les_cas à 1)
+nb_cas_171_ou_moins # nombre de situations qui vont cotiser 171 trimestres ou moins : 31443 : que des cas de gens ayant commencé dans leur 21ème année, mais pas assez tôt pour être carrière longue, qui peuvent donc partir à 64 ans sans avoir leur 172 trimestres, puisque pour les non CL, ce n'est pas une exigence
+nb_cas_172 # nombre de situations qui vont cotiser 172 trimestres pile : 270751
+nb_cas_173_ou_plus #  nombre de situations qui vont cotiser 173 trimestres ou plus (donc plus que 43 ans) : 633668 = 67,7 % des cas vont cotiser plus que 43 ans <= CE CHIFFRE EST LE CHIFFRE LE PLUS IMPORTANT
 nb_cas_173 # 159681
 nb_cas_174 # 151342
 nb_cas_175 # 107993
+nb_cas_176_ou_plus = nb_cas_176 + nb_cas_177 + nb_cas_178 + nb_cas_179 + nb_cas_180
+nb_cas_176_ou_plus # 214 652 = 22,9 % des cas vont cotiser 44 ans ou plus
 nb_cas_176 # 74169
-#nb_cas_177_ou_plus # 140483 = 15% des cas
 nb_cas_177 # 63714
 nb_cas_178 # 58196
 nb_cas_179 # 18337
-# nés du 2 juin au 31 aout 2000 qui ont commencé à travailler le 30 novembre ou le 1er décembre 2017
-# nés en septembre 2000 qui ont commencé à travailler entre le 2 et le 31 décembre 2017 <= SUJET
-# nés en septembre 2000 qui ont commencé à travailler entre le 1er janvier et le 1er septembre 2018 <= SUJET
-# nés en octobre, novembre 2000 qui ont commencé à travailler le 31 août ou le 1er septembre 2018
-# nés en décembre 2000 qui ont commencé à travailler entre le 2 septembre et le 1er octobre 2018 <= SUJET
 nb_cas_180 # 236 
 #nb_cas_181_ou_plus # 0
 nb_cas_travail_43_plus # 575070
@@ -722,10 +799,20 @@ nb_cas_travail_44_plus # 117736
 nb_cas_travail_45_plus # 0
 
 
-#%% calculs sur les cas CL transitoires
+#%% 
+
+### IV - Simulations (générations transitoires, carrières longues) ###
+
+# calculs pour : 
+    # les situations transitoires (donc les gens né entre septembre 1961 et décembre 1968)
+    # des gens non carrière longue (c'est à dire qui ont commencé, grosso modo, après 21 ans)
+
+# initialisation des variables, ne pas prêter attention
 
 total_cas = 0
 nb_cas_changed = 0
+nb_cas_degraded = 0
+nb_cas_ameliored = 0
 nb_cas_171_ou_moins = 0
 nb_cas_172 = 0
 nb_cas_173 = 0
@@ -767,10 +854,14 @@ for Ny in range(1961,1969): # on ne va pas jusqu'en 1973 parce que la générati
                             result = calcul_situation_indiv(date_naissance, date_debut_travail, verbose = 0, enregistrer = 0, filename = "cas_CL_transitoires_1961_1972")
                             
                             total_cas += 1
-                            if result["situation_changee"]:
+                            if result["situation_changee"] != "non":
                                 nb_cas_changed += 1
+                            if result["situation_changee"] == "dégradée":
+                                nb_cas_degraded +=1
+                            if result["situation_changee"] == "améliorée":
+                                nb_cas_ameliored +=1
                                 
-                            if result["situation_changee"] or tous_les_cas:
+                            if result["situation_changee"] != "non" or tous_les_cas:
                                 if result["AP_nb_trim_reellement_cotises"] <= 171 : 
                                     nb_cas_171_ou_moins += 1
                                     # print("171-", date_naissance, date_debut_travail)
@@ -808,43 +899,51 @@ for Ny in range(1961,1969): # on ne va pas jusqu'en 1973 parce que la générati
                             print("autre erreur")
                             err = e
 
-# Avec tous les cas = 0 (donc que les cas changés par la réforme)
+# résultats
+
 total_cas # 7 828 038
-nb_cas_changed # 7 158 000
-nb_cas_171_ou_moins # 1 740 039
-nb_cas_172 # 210 846
-#nb_cas_173_ou_plus # 5 207 115 = 66.5 % des cas
-nb_cas_173 # 264390
-nb_cas_174 # 199741
-nb_cas_175 # 184817
-nb_cas_176 # 2639517
-#nb_cas_177_ou_plus # 1918650 = 24.5 % des cas
-nb_cas_177 # 806430
-nb_cas_178 # 551299
-nb_cas_179 # 560803
+nb_cas_changed # 6245777
+nb_cas_degraded # 4577298
+nb_cas_ameliored # 1668479
+
+# Avec tous les cas = 0 (donc que les cas changés par la réforme)
+nb_cas_171_ou_moins # 2053121
+nb_cas_172 # 1595692
+#nb_cas_173_ou_plus # 2596964 =  % des cas
+nb_cas_173 # 941517
+nb_cas_174 # 714050
+nb_cas_175 # 683152
+nb_cas_176 # 140367
+#nb_cas_177_ou_plus #  = 24.5 % des cas
+nb_cas_177 # 70164
+nb_cas_178 # 38324
+nb_cas_179 # 9272
 nb_cas_180 # 118
 #nb_cas_181_ou_plus # 0
-nb_cas_travail_43_plus # 5166610
-nb_cas_travail_44_plus # 1330079
+nb_cas_travail_43_plus # 2076811
+nb_cas_travail_44_plus # 96630
 nb_cas_travail_45_plus # 0
 
+
+#TODO : remplir au dessus
+#TODO : faire tourner et remplir en dessous
+
+
 # Avec tous les cas = 1 (donc y compris les cas PAS changés par la réforme)
-total_cas # 7 828 038
-nb_cas_changed # 5 635 469
-nb_cas_171_ou_moins # 2 161 839
-nb_cas_172 # 1 505 540
-#nb_cas_173_ou_plus # 4 160 659 = 53,1 % des cas
-nb_cas_173 # 1 121 845
-nb_cas_174 # 983 602
-nb_cas_175 # 1 024 116
+nb_cas_171_ou_moins # 2 121 690
+nb_cas_172 # 1 697 001
+#nb_cas_173_ou_plus # = 53,1 % des cas
+nb_cas_173 # 1 107 573
+nb_cas_174 # 946 698
+nb_cas_175 # 941 980
 nb_cas_176 # 405 082
-#nb_cas_177_ou_plus # 626014 = 7.9 % des cas
+#nb_cas_177_ou_plus #  = 7.9 % des cas
 nb_cas_177 # 296 766
 nb_cas_178 # 245 806
 nb_cas_179 # 82 380
 nb_cas_180 # 1062
 #nb_cas_181_ou_plus # 0
-nb_cas_travail_43_plus # 3 544 678
+nb_cas_travail_43_plus # 3 446 330
 nb_cas_travail_44_plus # 525 513
 nb_cas_travail_45_plus # 0
 
@@ -922,4 +1021,24 @@ for Ny in range(1961,1969): # on ne va pas jusqu'en 1973 parce que la générati
                         except Exception as e:
                             print("autre erreur")
                             err = e
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
